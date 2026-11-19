@@ -22,7 +22,9 @@ from backend.services.model_service import model_service
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    cors_origins_env = os.environ.get("CORS_ORIGINS", "*")
+    cors_origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()] if cors_origins_env != "*" else "*"
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True)
 
     # Initialize SQLite, load Phase 5 trained models ONCE, and warm derived read-only data cache
     init_db()
@@ -156,6 +158,8 @@ def create_app() -> Flask:
 
     FRONTEND_DIST = os.path.join(PROJECT_ROOT, "frontend", "dist")
 
+    @app.route("/EV-Charging-Station-Optimizationc", defaults={"path": ""})
+    @app.route("/EV-Charging-Station-Optimizationc/<path:path>")
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_frontend(path):

@@ -31,6 +31,7 @@ const PAGE_TITLES = {
 export function Navbar({ activePage, health, onMenuClick }) {
   const meta = PAGE_TITLES[activePage] || PAGE_TITLES.dashboard;
   const isHealthy = health?.status === 'healthy';
+  const isOffline = health?.status === 'offline';
 
   return (
     <header className="sticky top-0 z-20 h-16 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between gap-4">
@@ -53,12 +54,18 @@ export function Navbar({ activePage, health, onMenuClick }) {
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
             isHealthy
               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : isOffline
+              ? 'bg-rose-50 text-rose-700 border-rose-200'
               : 'bg-amber-50 text-amber-700 border-amber-200'
           }`}
         >
           <Activity className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">{isHealthy ? 'API & Models Ready' : 'Checking API...'}</span>
-          <span className="md:hidden">{isHealthy ? 'Online' : '...'}</span>
+          <span className="hidden md:inline">
+            {isHealthy ? 'API & Models Ready' : isOffline ? 'Backend Offline' : 'Connecting to API...'}
+          </span>
+          <span className="md:hidden">
+            {isHealthy ? 'Online' : isOffline ? 'Offline' : 'Connecting'}
+          </span>
         </div>
 
         {health?.database && (

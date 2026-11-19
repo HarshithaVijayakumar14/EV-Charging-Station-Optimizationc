@@ -129,7 +129,16 @@ cd ..
 
 ---
 
-## How to Run
+## Production Deployment (GitHub Pages + Render)
+
+The project utilizes a decoupled production architecture:
+- **Frontend (GitHub Pages):** Built and deployed automatically via [main.yml](file:///.github/workflows/main.yml) on push to `main`.
+- **Backend API (Render):** Managed WSGI service running Gunicorn configured with [render.yaml](file:///render.yaml) and [Procfile](file:///Procfile).
+- **Step-by-step Setup:** See [DEPLOYMENT_GUIDE.md](file:///DEPLOYMENT_GUIDE.md) for complete instructions on creating the Render Web Service and configuring the `VITE_API_BASE_URL` repository variable.
+
+---
+
+## How to Run Locally
 
 ### Option A: Unified Production Mode (Recommended)
 Runs both the Flask API and the pre-built React frontend from a single server:

@@ -19,12 +19,16 @@ CACHE_SCHEMA_VERSION = 1
 
 def _source_fingerprint() -> dict:
     """File size + mtime fingerprint to ensure derived cache always reflects the read-only source CSVs."""
+    cleaned_size = os.path.getsize(CLEANED_CSV) if os.path.exists(CLEANED_CSV) else None
+    cleaned_mtime = int(os.path.getmtime(CLEANED_CSV)) if os.path.exists(CLEANED_CSV) else None
+    features_size = os.path.getsize(HOURLY_FEATURES_CSV) if os.path.exists(HOURLY_FEATURES_CSV) else None
+    features_mtime = int(os.path.getmtime(HOURLY_FEATURES_CSV)) if os.path.exists(HOURLY_FEATURES_CSV) else None
     return {
         "schema_version": CACHE_SCHEMA_VERSION,
-        "cleaned_size": os.path.getsize(CLEANED_CSV),
-        "cleaned_mtime": int(os.path.getmtime(CLEANED_CSV)),
-        "features_size": os.path.getsize(HOURLY_FEATURES_CSV),
-        "features_mtime": int(os.path.getmtime(HOURLY_FEATURES_CSV)),
+        "cleaned_size": cleaned_size,
+        "cleaned_mtime": cleaned_mtime,
+        "features_size": features_size,
+        "features_mtime": features_mtime,
     }
 
 
@@ -48,14 +52,22 @@ class DataService:
         if os.path.exists(CACHE_FILE):
             try:
                 loaded = joblib.load(CACHE_FILE)
-                if loaded.get("fingerprint") == fp:
+                # In dev: match fingerprint. In production (where source CSVs are omitted): use bundled cache!
+                if loaded.get("fingerprint") == fp or (fp["cleaned_size"] is None and "summary" in loaded):
                     self._cache = loaded
                     return
             except Exception:
                 pass
 
-        self._cache = self._build_cache(fp)
-        joblib.dump(self._cache, CACHE_FILE, compress=3)
+        if os.path.exists(CLEANED_CSV) and os.path.exists(HOURLY_FEATURES_CSV):
+            self._cache = self._build_cache(fp)
+            joblib.dump(self._cache, CACHE_FILE, compress=3)
+        elif os.path.exists(CACHE_FILE):
+            self._cache = joblib.load(CACHE_FILE)
+        else:
+            raise FileNotFoundError(
+                f"Neither pre-computed data cache ({CACHE_FILE}) nor source CSV datasets were found."
+            )
 
     def _build_cache(self, fingerprint: dict) -> dict:
         if not os.path.exists(CLEANED_CSV):

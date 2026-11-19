@@ -22,7 +22,7 @@ export default function App() {
         const data = await getHealth();
         if (mounted) setHealth(data);
       } catch (e) {
-        if (mounted) setHealth({ status: 'degraded', error: e.message });
+        if (mounted) setHealth({ status: 'offline', error: e.message });
       }
     };
     check();

@@ -1,8 +1,14 @@
 import axios from 'axios';
 
+// Configurable API base URL:
+// In production (GitHub Pages), set VITE_API_BASE_URL in GitHub repo variables to point to Render
+// In local development, falls back to empty string to leverage the Vite proxy or unified Flask server
+const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+export const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
-  timeout: 15000,
+  baseURL: API_BASE_URL,
+  timeout: 25000,
 });
 
 export const getHealth = async () => {

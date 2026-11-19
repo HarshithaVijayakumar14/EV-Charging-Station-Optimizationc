@@ -16,6 +16,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOURLY_FEATURES_CSV = os.path.join(PROJECT_ROOT, "dataset", "processed", "ev_charging_hourly_features.csv")
 INVENTORY_CSV = os.path.join(PROJECT_ROOT, "dataset", "processed", "charging_point_inventory.csv")
 HISTORICAL_AVAILABILITY_CSV = os.path.join(PROJECT_ROOT, "dataset", "processed", "historical_station_availability.csv")
+HISTORICAL_AVAILABILITY_RECENT_CSV = os.path.join(PROJECT_ROOT, "dataset", "processed", "historical_availability_recent.csv")
 
 
 def reconstruct_historical_availability(
@@ -106,18 +107,37 @@ class HistoricalAvailabilityService:
     def initialize(self) -> None:
         if self._tail_cache is not None:
             return
-        if not os.path.exists(self.availability_csv):
-            reconstruct_historical_availability(output_csv=self.availability_csv)
+
+        target_file = self.availability_csv
+        if not os.path.exists(target_file):
+            if os.path.exists(HISTORICAL_AVAILABILITY_RECENT_CSV):
+                target_file = HISTORICAL_AVAILABILITY_RECENT_CSV
+            elif os.path.exists(HOURLY_FEATURES_CSV):
+                reconstruct_historical_availability(output_csv=self.availability_csv)
+            else:
+                target_file = HISTORICAL_AVAILABILITY_RECENT_CSV
 
         # Cache last 168 hours (7 days) per station for fast API queries
-        df = pd.read_csv(self.availability_csv, low_memory=False)
-        self._tail_cache = {}
-        for st, g in df.groupby("station_id"):
-            self._tail_cache[st] = g.tail(168).reset_index(drop=True)
+        if os.path.exists(target_file):
+            df = pd.read_csv(target_file, low_memory=False)
+            self._tail_cache = {}
+            for st, g in df.groupby("station_id"):
+                self._tail_cache[st] = g.tail(168).reset_index(drop=True)
+        else:
+            self._tail_cache = {}
 
     def _ensure_full_df(self) -> pd.DataFrame:
         if self._df is None:
-            self._df = pd.read_csv(self.availability_csv)
+            if os.path.exists(self.availability_csv):
+                self._df = pd.read_csv(self.availability_csv, low_memory=False)
+            elif os.path.exists(HISTORICAL_AVAILABILITY_RECENT_CSV):
+                self._df = pd.read_csv(HISTORICAL_AVAILABILITY_RECENT_CSV, low_memory=False)
+            else:
+                self._df = pd.DataFrame(columns=[
+                    "timestamp", "station_id", "observed_point_count",
+                    "occupied_point_count", "free_observed_point_count",
+                    "unknown_point_count", "availability_confidence", "data_quality_flags"
+                ])
         return self._df
 
     def get_recent_station_availability(self, station_id: str, limit: int = 48) -> List[Dict]:

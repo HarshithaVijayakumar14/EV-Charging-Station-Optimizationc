@@ -1,0 +1,16 @@
+vehicle_id,manufacturer,model,vehicle_category,battery_capacity_kwh,maximum_ac_charging_power_kw,maximum_dc_charging_power_kw,connector_type,charging_efficiency,charging_curve_reference,specification_source,specification_confidence
+tesla_model_3_sr,Tesla,Model 3 Standard Range,Four-Wheeler,60.0,11.5,170.0,J1772 (via OEM adapter) / NACS,0.90,Tesla_Standard_Taper_Curve,Tesla Technical Specs & EPA Test Data,High
+tesla_model_y_lr,Tesla,Model Y Long Range,Four-Wheeler,75.0,11.5,250.0,J1772 (via OEM adapter) / NACS,0.90,Tesla_Standard_Taper_Curve,Tesla Technical Specs & EPA Test Data,High
+nissan_leaf_40,Nissan,Leaf (40 kWh),Four-Wheeler,40.0,6.6,50.0,J1772,0.88,Nissan_Leaf_CC_CV_Curve,Nissan Motor Co. Official Specs,High
+chevy_bolt_ev,Chevrolet,Bolt EV,Four-Wheeler,65.0,11.5,55.0,J1772,0.89,GM_Bolt_Taper_Curve,General Motors Official Specification Sheet,High
+hyundai_ioniq_5,Hyundai,Ioniq 5 Long Range,Four-Wheeler,77.4,10.9,230.0,J1772,0.91,E-GMP_High_Speed_Curve,Hyundai Motor Group Technical Specs,High
+ford_mach_e_sr,Ford,Mustang Mach-E SR,Four-Wheeler,72.0,10.5,115.0,J1772,0.89,Ford_Mach_E_Charging_Profile,Ford Motor Company Technical Specs,High
+vw_id4_pro,Volkswagen,ID.4 Pro,Four-Wheeler,82.0,11.0,135.0,J1772,0.89,MEB_Platform_Curve,Volkswagen Group Official Specs,High
+bmw_i4_edrive40,BMW,i4 eDrive40,Four-Wheeler,83.9,11.0,200.0,J1772,0.90,BMW_Gen5_Charging_Profile,BMW AG Official Technical Data,High
+zero_srf,Zero Motorcycles,SR/F Premium,Two-Wheeler,17.3,6.0,0.0,J1772,0.88,Zero_Rapid_Charge_Profile,Zero Motorcycles Official Technical Specifications,High
+zero_fxe,Zero Motorcycles,FXE,Two-Wheeler,7.2,1.3,0.0,NEMA 5-20R / J1772,0.85,Zero_Standard_1kW_Profile,Zero Motorcycles Official Technical Specifications,High
+livewire_one,LiveWire,LiveWire ONE,Two-Wheeler,15.4,1.4,25.0,J1772 / CCS1,0.88,LiveWire_Revelation_Profile,LiveWire EV LLC Technical Specs,High
+super_soco_tc_max,Super Soco,TC Max,Two-Wheeler,3.24,1.0,0.0,NEMA 5-20R (120V Standard Wall/Plug),0.85,SuperSoco_Battery_BMS_Curve,Super Soco Official Technical Specs,High
+energica_eva_ribelle,Energica,Eva Ribelle,Two-Wheeler,21.5,3.3,24.0,J1772 / CCS1,0.90,Energica_Fast_Charge_Profile,Energica Motor Company SpA Technical Sheet,High
+custom_four_wheeler,Custom,Custom Four-Wheeler Template,Four-Wheeler,60.0,7.2,50.0,J1772,0.89,Standard_Linear_Taper_Approximation,User-Provided Values,User-Provided
+custom_two_wheeler,Custom,Custom Two-Wheeler Template,Two-Wheeler,10.0,3.3,0.0,J1772,0.87,Standard_Linear_Taper_Approximation,User-Provided Values,User-Provided

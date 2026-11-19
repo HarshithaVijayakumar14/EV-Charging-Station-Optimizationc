@@ -20,14 +20,18 @@ frontend/node_modules/
 *.sqlite3
 *.log
 
-# Large datasets
+# Large datasets (excluded to stay well under GitHub 100MB limit and Render RAM limits)
 dataset/raw/
 dataset/processed/*.csv
+!dataset/processed/charging_point_inventory.csv
+!dataset/processed/historical_availability_recent.csv
 data/*.csv
+!data/vehicle_catalog.csv
 EVChargingStationUsage.csv
 
-# Generated files
-backend/cache/
+# Generated cache files (bundle compact lightweight production cache)
+backend/cache/*
+!backend/cache/dashboard_data_cache.joblib
 backups/
 temp/
 tmp/

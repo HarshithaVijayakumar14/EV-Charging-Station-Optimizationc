@@ -19,8 +19,8 @@ CACHE_DIR = os.path.join(BACKEND_DIR, "cache")
 DB_PATH = os.path.join(BACKEND_DIR, "database", "ev_app.db")
 
 # Flask settings
-HOST = os.environ.get("EV_BACKEND_HOST", "127.0.0.1")
-PORT = int(os.environ.get("EV_BACKEND_PORT", "5000"))
+HOST = os.environ.get("EV_BACKEND_HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", os.environ.get("EV_BACKEND_PORT", "5000")))
 DEBUG = os.environ.get("EV_BACKEND_DEBUG", "false").lower() == "true"
 
 # Minimum historical span required to produce reliable lag-based predictions
