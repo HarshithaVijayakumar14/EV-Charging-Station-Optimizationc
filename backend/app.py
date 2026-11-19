@@ -158,6 +158,14 @@ def create_app() -> Flask:
 
     FRONTEND_DIST = os.path.join(PROJECT_ROOT, "frontend", "dist")
 
+    @app.route("/assets/<path:filename>")
+    @app.route("/EV-Charging-Station-Optimizationc/assets/<path:filename>")
+    def serve_assets(filename):
+        assets_dir = os.path.join(FRONTEND_DIST, "assets")
+        if os.path.exists(assets_dir):
+            return send_from_directory(assets_dir, filename)
+        return jsonify({"status": "error", "message": "Assets directory not found."}), 404
+
     @app.route("/EV-Charging-Station-Optimizationc", defaults={"path": ""})
     @app.route("/EV-Charging-Station-Optimizationc/<path:path>")
     @app.route("/", defaults={"path": ""})
