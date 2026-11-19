@@ -1,0 +1,4 @@
+year_split,total_mae,arr_error_mae,dwell_error_mae,residual_error_mae,arr_error_share_pct,dwell_error_share_pct,residual_error_share_pct
+2018_validation,0.2512,0.254,0.0,0.2307,52.4,0.0,47.6
+2019_test,0.2562,0.2608,0.0,0.2423,51.8,0.0,48.2
+2020_ood,0.2207,0.2372,0.0,0.1265,65.2,0.0,34.8

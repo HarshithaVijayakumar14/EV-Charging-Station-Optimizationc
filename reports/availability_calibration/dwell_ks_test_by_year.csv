@@ -1,0 +1,6 @@
+split,n_sessions,mean_dwell_min,std_dwell_min,coefficient_of_variation,ks_statistic,p_value,exponential_assumption_holds
+2011_2017_train,148738,159.67,141.59,0.8868,0.1236,1.4265e-133,False
+2018_val,42795,134.03,101.92,0.7604,0.1552,7.8753e-211,False
+2019_test,47721,134.04,106.31,0.7931,0.1453,1.099e-184,False
+2020_ood,20090,137.15,122.96,0.8965,0.0936,1.0017e-76,False
+overall,259344,148.98,128.9,0.8653,0.1274,4.9072e-142,False

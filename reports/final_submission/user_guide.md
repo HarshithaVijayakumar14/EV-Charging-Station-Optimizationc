@@ -162,6 +162,13 @@ npm run dev
 - **Test 2019 Calibration Curve:** Demonstrates near-perfect alignment between mean actual and mean predicted arrivals by clock hour.
 - **Glossary:** Plain-language explanations of RMSE, MAE, count sparsity, and decimal arrival rates.
 
+### 6. Probabilistic Availability & Queueing Propagation
+- **Station & Horizon Selectors:** Toggle between 1-Hour-Ahead and 24-Hour Day-Ahead probabilistic forecasts for any station.
+- **Discrete Arrival-Count PMF:** Interactive bar chart displaying probability $P(Y = k)$ across arrival counts $k=0..6+$. Distinct emerald highlighting shows probability of an idle station $P(0)$, while amber flags port competition risk $P(\ge 2)$.
+- **Plain-Language Driver Guidance:** Translates mathematical PMFs into clear, actionable prose (e.g. *"Station is almost certainly idle (88% chance of 0 arrivals)"* vs *"Real chance of 2+ simultaneous arrivals (18%); heightened risk of port competition"*).
+- **Distribution-Propagated Erlang-B:** Visual range bar displaying median $P(\text{all ports occupied})$ and calibrated 5% to 95% uncertainty bounds, contrasted directly against the point-estimate baseline to highlight Jensen's inequality shifts.
+- **Scoring Rules & Calibration Table:** Evaluates Poisson GLM, Negative Binomial, Hurdle NB, and XGBoost-as-Poisson under strictly proper scoring rules (Negative Log Score, RPS) and Randomized PIT uniformity.
+
 ---
 
 ## 5. Troubleshooting & FAQ

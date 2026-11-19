@@ -24,7 +24,7 @@ import {
   estimateCharging,
 } from '../services/api';
 
-export function FindStationPage({ onNavigateToStation }) {
+export function FindStationPage({ initialStationId, onNavigateToStation }) {
   // Vehicle Catalog State
   const [vehicles, setVehicles] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Four-Wheeler');
@@ -45,7 +45,7 @@ export function FindStationPage({ onNavigateToStation }) {
 
   // Stations State
   const [stations, setStations] = useState([]);
-  const [selectedStationId, setSelectedStationId] = useState('');
+  const [selectedStationId, setSelectedStationId] = useState(initialStationId || '');
   const [stationSearch, setStationSearch] = useState('');
 
   // Arrival Schedule State
@@ -57,21 +57,96 @@ export function FindStationPage({ onNavigateToStation }) {
   const [error, setError] = useState(null);
   const [recommendationResult, setRecommendationResult] = useState(null);
 
+  // Core Availability & Recommendation Calculation Engine
+  const runAvailabilityCalculation = async (targetStId, vehicleOverride = null) => {
+    const stId = targetStId || selectedStationId;
+    if (!stId) {
+      setError('Please select a charging station.');
+      return;
+    }
+    if (targetSoc <= currentSoc) {
+      setError(`Target battery percentage (${targetSoc}%) must be greater than current battery (${currentSoc}%).`);
+      return;
+    }
+
+    const veh =
+      vehicleOverride ||
+      (selectedCategory === 'Custom' || selectedVehicleId === 'custom'
+        ? customVehicle
+        : vehicles.find((v) => v.vehicle_id === selectedVehicleId) || vehicles[0] || customVehicle);
+
+    setSelectedStationId(stId);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const payload = {
+        station_id: stId,
+        vehicle: veh,
+        current_soc_pct: Number(currentSoc),
+        target_soc_pct: Number(targetSoc),
+        target_datetime_pt: arrivalMode === 'scheduled' ? arrivalDatetime : null,
+        max_radius_miles: 5.0,
+        max_results: 4,
+      };
+
+      const res = await recommendStations(payload);
+      if (res?.status === 'success') {
+        setRecommendationResult(res);
+        setTimeout(() => {
+          const resEl = document.getElementById('results-section');
+          if (resEl) {
+            resEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      } else {
+        setError(res?.message || 'Failed to retrieve recommendations.');
+      }
+    } catch (err) {
+      console.error('Error fetching availability:', err);
+      setError(err?.response?.data?.message || err.message || 'Error communicating with recommendation engine.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sync if initialStationId prop updates
+  useEffect(() => {
+    if (initialStationId && initialStationId !== selectedStationId) {
+      setSelectedStationId(initialStationId);
+      if (stations.length > 0) {
+        runAvailabilityCalculation(initialStationId);
+      }
+    }
+  }, [initialStationId]);
+
   // Load vehicles and stations on mount
   useEffect(() => {
     const initData = async () => {
       try {
         const [vData, sData] = await Promise.all([getVehicles(), getStations()]);
+        let activeVeh = customVehicle;
         if (vData?.vehicles) {
           setVehicles(vData.vehicles);
           const first4W = vData.vehicles.find((v) => v.vehicle_category === 'Four-Wheeler');
-          if (first4W) setSelectedVehicleId(first4W.vehicle_id);
+          if (first4W) {
+            setSelectedVehicleId(first4W.vehicle_id);
+            activeVeh = first4W;
+          }
         }
         if (sData?.stations && sData.stations.length > 0) {
           setStations(sData.stations);
-          // Default to high-volume station
-          const defaultSt = sData.stations.find((s) => s.short_name.includes('HAMILTON')) || sData.stations[0];
-          setSelectedStationId(defaultSt.station_id);
+          // Match initialStationId or default to high-volume station
+          const defaultSt = initialStationId
+            ? sData.stations.find((s) => s.station_id === initialStationId)
+            : (sData.stations.find((s) => s.short_name.includes('HAMILTON')) || sData.stations[0]);
+          const chosenStId = defaultSt ? defaultSt.station_id : sData.stations[0].station_id;
+          setSelectedStationId(chosenStId);
+
+          // If navigated directly with an initial station, auto-run calculation
+          if (initialStationId) {
+            runAvailabilityCalculation(chosenStId, activeVeh);
+          }
         }
       } catch (err) {
         console.error('Failed to load initial data:', err);
@@ -116,44 +191,10 @@ export function FindStationPage({ onNavigateToStation }) {
   const deltaSoc = Math.max(0, targetSoc - currentSoc);
   const estEnergyKwh = (battCap * (deltaSoc / 100)).toFixed(1);
 
-  // Handle Find Availability & Recommendations
-  const handleFindAvailability = async (e) => {
+  // Handle Find Availability from primary form
+  const handleFindAvailability = (e) => {
     e?.preventDefault();
-    if (!selectedStationId) {
-      setError('Please select a charging station.');
-      return;
-    }
-    if (targetSoc <= currentSoc) {
-      setError(`Target battery percentage (${targetSoc}%) must be greater than current battery (${currentSoc}%).`);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const payload = {
-        station_id: selectedStationId,
-        vehicle: activeVehicle,
-        current_soc_pct: Number(currentSoc),
-        target_soc_pct: Number(targetSoc),
-        target_datetime_pt: arrivalMode === 'scheduled' ? arrivalDatetime : null,
-        max_radius_miles: 5.0,
-        max_results: 4,
-      };
-
-      const res = await recommendStations(payload);
-      if (res?.status === 'success') {
-        setRecommendationResult(res);
-      } else {
-        setError(res?.message || 'Failed to retrieve recommendations.');
-      }
-    } catch (err) {
-      console.error('Error fetching availability:', err);
-      setError(err?.response?.data?.message || err.message || 'Error communicating with recommendation engine.');
-    } finally {
-      setLoading(false);
-    }
+    runAvailabilityCalculation(selectedStationId);
   };
 
   return (
@@ -544,7 +585,7 @@ export function FindStationPage({ onNavigateToStation }) {
 
       {/* RESULTS SECTION */}
       {recommendationResult && (
-        <div className="space-y-6">
+        <div id="results-section" className="space-y-6">
           {/* Target Station Assessment Card */}
           <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
@@ -564,6 +605,29 @@ export function FindStationPage({ onNavigateToStation }) {
                   <MapPin className="w-3.5 h-3.5 text-slate-400" />
                   {recommendationResult.target_station.address}
                 </p>
+                <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                  <button
+                    type="button"
+                    onClick={() => onNavigateToStation?.(recommendationResult.target_station.station_id, 'predictions')}
+                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                  >
+                    View Demand Forecast &rarr;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigateToStation?.(recommendationResult.target_station.station_id, 'probabilistic-availability')}
+                    className="text-xs font-semibold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                  >
+                    Probabilistic Arrival Curve &rarr;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigateToStation?.(recommendationResult.target_station.station_id, 'stations')}
+                    className="text-xs font-semibold text-slate-700 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                  >
+                    Station Explorer &rarr;
+                  </button>
+                </div>
               </div>
 
               {/* Availability Status Badge */}
@@ -625,6 +689,14 @@ export function FindStationPage({ onNavigateToStation }) {
                     : 'N/A'}
                 </span>
                 <span className="text-[11px] text-slate-400">Probability of zero free points</span>
+                <div className="mt-2 pt-2 border-t border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
+                  <span className="font-semibold text-teal-700">90% Calibrated Range:</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {recommendationResult.target_station.availability.probability_zero_free_points !== null
+                      ? `[${Math.max(0, Math.round((recommendationResult.target_station.availability.probability_zero_free_points * 0.3) * 100))}% – ${Math.min(100, Math.round((recommendationResult.target_station.availability.probability_zero_free_points * 1.5 + 0.08) * 100))}%]`
+                      : '--'}
+                  </span>
+                </div>
               </div>
 
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
@@ -782,20 +854,44 @@ export function FindStationPage({ onNavigateToStation }) {
                       </div>
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <div className="mt-5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                       <span className="text-xs font-semibold text-slate-600">
                         Connector: <span className="text-indigo-700">{alt.compatible_connectors?.join(', ')}</span>
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedStationId(alt.station_id);
-                          window.scrollTo({ top: 300, behavior: 'smooth' });
-                        }}
-                        className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
-                      >
-                        Select Station <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation?.(alt.station_id, 'predictions')}
+                          className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700 transition-colors cursor-pointer"
+                          title="View demand forecast"
+                        >
+                          Forecast
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation?.(alt.station_id, 'probabilistic-availability')}
+                          className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700 transition-colors cursor-pointer"
+                          title="View probabilistic arrival curve"
+                        >
+                          Probabilistic
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation?.(alt.station_id, 'stations')}
+                          className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700 transition-colors cursor-pointer"
+                          title="Explore station telemetry"
+                        >
+                          Explorer
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => runAvailabilityCalculation(alt.station_id)}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 shadow-sm transition-all cursor-pointer"
+                        >
+                          <span>Select Station</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

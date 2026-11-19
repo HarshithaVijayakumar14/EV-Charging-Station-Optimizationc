@@ -1,0 +1,75 @@
+{
+  "task": "Probabilistic EV Arrival Count Forecasting",
+  "dataset_hash": "b8b51b3caacf1a3441fdfc27f7f90db19887c77d66f43ab10814e2f84a80082e",
+  "primary_1h_ahead": {
+    "horizon": "1h",
+    "winner": "poisson_glm",
+    "validation_2018_metrics": {
+      "empirical_frequency": {
+        "log_score": 0.3947,
+        "rps": 0.1225,
+        "zero_brier": 0.1078,
+        "coverage_90": 0.9913,
+        "mean_width_90": 0.8254
+      },
+      "poisson_glm": {
+        "log_score": 0.3611,
+        "rps": 0.1117,
+        "zero_brier": 0.0979,
+        "coverage_90": 0.9915,
+        "mean_width_90": 0.7701
+      },
+      "negative_binomial": {
+        "log_score": 0.3611,
+        "rps": 0.1117,
+        "zero_brier": 0.0979,
+        "coverage_90": 0.9915,
+        "mean_width_90": 0.7701
+      },
+      "hurdle_nb": {
+        "log_score": 0.4003,
+        "rps": 0.1155,
+        "zero_brier": 0.0967,
+        "coverage_90": 0.9929,
+        "mean_width_90": 1.0627
+      }
+    },
+    "elapsed_sec": 29.7
+  },
+  "secondary_24h_ahead": {
+    "horizon": "24h",
+    "winner": "poisson_glm",
+    "validation_2018_metrics": {
+      "empirical_frequency": {
+        "log_score": 0.3947,
+        "rps": 0.1225,
+        "zero_brier": 0.1078,
+        "coverage_90": 0.9913,
+        "mean_width_90": 0.8254
+      },
+      "poisson_glm": {
+        "log_score": 0.3703,
+        "rps": 0.1147,
+        "zero_brier": 0.1005,
+        "coverage_90": 0.9916,
+        "mean_width_90": 0.8413
+      },
+      "negative_binomial": {
+        "log_score": 0.3703,
+        "rps": 0.1147,
+        "zero_brier": 0.1005,
+        "coverage_90": 0.9916,
+        "mean_width_90": 0.8414
+      },
+      "hurdle_nb": {
+        "log_score": 0.4079,
+        "rps": 0.1177,
+        "zero_brier": 0.099,
+        "coverage_90": 0.9977,
+        "mean_width_90": 1.2389
+      }
+    },
+    "elapsed_sec": 22.76
+  },
+  "total_training_time_sec": 71.48
+}

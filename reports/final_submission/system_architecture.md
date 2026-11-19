@@ -66,10 +66,13 @@ The project is structured as an end-to-end, multi-stage machine learning and sof
 |  ├── `backend/routes/dashboard.py`       --> `/api/dashboard/summary`                             |
 |  ├── `backend/routes/stations.py`        --> `/api/stations`, `/api/stations/<id>`                 |
 |  ├── `backend/routes/predictions.py`     --> `/api/predictions/1-hour`, `/24-hour`, `/station/<id>`|
-|  └── `backend/routes/recommendations.py` --> `/api/recommendations`                                |
+|  ├── `backend/routes/recommendations.py` --> `/api/recommendations`                                |
+|  ├── `backend/routes/probabilistic.py`   --> `/api/probabilistic/arrivals`, `/availability`, ...   |
+|  └── `backend/routes/charging_assistant.py` --> `/api/charging-points/*`, `/api/availability/*`   |
 |                                                                                                    |
 |  Core Domain Services:                                                                             |
 |  ├── `ModelService`: Singleton model & preprocessor bundle loader (loaded once at app start)       |
+|  ├── `ProbabilisticService`: Singleton loader for count PMFs, scoring rules & Erlang propagation   |
 |  ├── `DataService`: Fingerprinted derived cache (`dashboard_data_cache.joblib`), station tails    |
 |  ├── `PredictionService`: Zero-leakage causal feature assembler, 1h/24h scoring, backtest engine   |
 |  └── `RecommendationService`: Rule-based explainable planning suggestions with capacity disclaimer|
@@ -91,7 +94,8 @@ The project is structured as an end-to-end, multi-stage machine learning and sof
 |  ├── Predictions (`PredictionsPage.jsx`): Station selector, 1h & 24h forecasts, historical backtest|
 |  ├── Station Explorer (`StationAnalysisPage.jsx`): 46-station directory, dwell vs charge durations |
 |  ├── Recommendations (`RecommendationsPage.jsx`): 5-category planning cards, capacity disclaimers |
-|  └── Model Evaluation (`ModelPerformancePage.jsx`): Val/Test/OOD benchmarks, permutation importance|
+|  ├── Model Evaluation (`ModelPerformancePage.jsx`): Val/Test/OOD benchmarks, permutation importance|
+|  └── Probabilistic Availability (`ProbabilisticAvailabilityPage.jsx`): Discrete PMFs & Erlang-B UQ |
 |                                                                                                    |
 |  Chart Engine: Recharts (Responsive SVG Area, Bar, Line, and Composed charts)                      |
 |  Design System: Tailwind CSS corporate palette, Lucide React icons, mobile-responsive sidebar      |

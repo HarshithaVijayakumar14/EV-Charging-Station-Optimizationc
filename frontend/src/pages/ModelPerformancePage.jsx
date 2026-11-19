@@ -369,6 +369,46 @@ export function ModelPerformancePage() {
         </div>
       </div>
 
+      {/* Probabilistic Count Forecasting & Scoring Rules Section */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layers className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-base font-bold text-slate-900">
+              Probabilistic Arrival-Count Forecasting & Scoring Rules
+            </h2>
+          </div>
+          <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full">
+            Strictly Proper Scoring Rules
+          </span>
+        </div>
+        <p className="text-xs text-slate-600">
+          Evaluated on the 2019 Main Test set (289,080 station-hours). Compares Poisson GLM, Negative Binomial, Hurdle NB, and XGBoost-as-Poisson against the empirical baseline under strictly proper scoring rules.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+          <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+            <span className="text-[10px] uppercase font-bold text-emerald-800">Winner: XGBoost-as-Poisson</span>
+            <div className="text-lg font-extrabold text-emerald-700 mt-1">Log Score: 0.3523</div>
+            <span className="text-[10px] text-emerald-600">RPS: 0.1099 | Zero Brier: 0.0940</span>
+          </div>
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <span className="text-[10px] uppercase font-bold text-slate-600">Poisson GLM Baseline</span>
+            <div className="text-lg font-bold text-slate-800 mt-1">Log Score: 0.3770</div>
+            <span className="text-[10px] text-slate-500">RPS: 0.1180 | Zero Brier: 0.1017</span>
+          </div>
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <span className="text-[10px] uppercase font-bold text-slate-600">Negative Binomial (NB2)</span>
+            <div className="text-lg font-bold text-slate-800 mt-1">Log Score: 0.3771</div>
+            <span className="text-[10px] text-slate-500">Dispersion α = 0.0009</span>
+          </div>
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <span className="text-[10px] uppercase font-bold text-slate-600">Hurdle Negative Binomial</span>
+            <div className="text-lg font-bold text-slate-800 mt-1">Log Score: 0.4152</div>
+            <span className="text-[10px] text-slate-500">Two-Stage Zero Hurdle Model</span>
+          </div>
+        </div>
+      </div>
+
       {/* Plain-Language Metric Glossary */}
       <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">

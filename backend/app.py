@@ -14,10 +14,12 @@ from backend.database.db import get_db_counts, init_db
 from backend.routes.charging_assistant import charging_assistant_bp
 from backend.routes.dashboard import dashboard_bp
 from backend.routes.predictions import predictions_bp
+from backend.routes.probabilistic import probabilistic_bp
 from backend.routes.recommendations import recommendations_bp
 from backend.routes.stations import stations_bp
 from backend.services.data_service import data_service
 from backend.services.model_service import model_service
+from backend.services.probabilistic_service import probabilistic_service
 
 
 def create_app() -> Flask:
@@ -30,6 +32,7 @@ def create_app() -> Flask:
     init_db()
     model_service.load_all()
     data_service.initialize()
+    probabilistic_service.load_all()
 
     # Register modular route blueprints
     app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
@@ -37,6 +40,7 @@ def create_app() -> Flask:
     app.register_blueprint(predictions_bp, url_prefix="/api/predictions")
     app.register_blueprint(recommendations_bp, url_prefix="/api/recommendations")
     app.register_blueprint(charging_assistant_bp, url_prefix="/api")
+    app.register_blueprint(probabilistic_bp, url_prefix="/api/probabilistic")
 
     @app.route("/api/health", methods=["GET"])
     def health():

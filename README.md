@@ -22,7 +22,28 @@ An end-to-end Machine Learning and Decision Support system for municipal EV char
   - **Vehicle Catalog & Compatibility:** 15 verified OEM electric vehicles (four-wheelers, two-wheelers, custom) with J1772, NACS adapter, and NEMA 5-20R Level 1 rules.
   - **Battery CC/CV Taper Charging Estimator:** Accurate duration modeling reflecting constant-current bulk ($<80\%$) and constant-voltage thermal taper ($80\%\text{--}100\%$) phases.
   - **Nearby Station Recommendation Engine:** Multi-factor ranking by geodesic distance, compatibility, available ports, and charging speed within 5 miles.
+- **Empirical Availability Calibration & Error Propagation (Research Contribution):**
+  - **Queueing vs. Forecast Error Propagation:** Rigorous variance decomposition separating arrival prediction error from dwell time and Erlang queueing assumptions.
+  - **Distribution Shift & Robustness:** Evaluates calibration drift under temporal shift (2018 validation $\to$ 2019 test $\to$ 2020 COVID shock).
+  - **Recalibrated Full-Station Probabilities:** Out-of-sample Isotonic and Platt calibration achieving an 89.1% reduction in Expected Calibration Error (ECE from 9.95% down to 1.08%).
+- **Calibrated Probabilistic Arrival Forecasting & Erlang-B Queueing Propagation (Phase 9):**
+  - **Discrete Arrival-Count PMF:** Generates full discrete probability distributions over $k=0..K$ arrivals, capturing zero-inflation (84.67% idle hours) and multi-vehicle surges.
+  - **Strictly Proper Scoring Rules:** Benchmarked under Mean Negative Log Score (NLL) and Ranked Probability Score (RPS) on 289,080 test station-hours.
+  - **Randomized PIT Uniformity:** Continuous Probability Integral Transform confirms unbiased calibration on discrete counts ($D = 0.0144$).
+  - **Distribution-Propagated Erlang-B Availability:** Monte Carlo propagation of arrival distributions through hardware inventory loss models, producing calibrated 5–95% uncertainty intervals for $P(\text{all ports occupied})$.
+  - **Operational Jensen Gain:** Slashes full-station Brier Score from 0.05204 (point baseline) to 0.03634 (+30.17% error reduction) across 6,804 ground-truth historical hours.
 - **Dual-Mode Deployment:** Unified single-command server hosting both backend API and pre-compiled React SPA on port 5000, or modular development setup with Vite hot-reloading on port 5173.
+
+---
+
+## Research Gap and Contribution
+
+> *"Existing studies forecast charging demand and, separately, station availability using queueing or occupancy models. However, it remains unclear how arrival-forecast errors propagate through dwell-time and queueing assumptions into port-availability estimates, and whether the resulting full-station probabilities are calibrated under temporal distribution shift. This work evaluates forecast-driven availability against occupancy reconstructed from session records, using calibration and decision-level error metrics, and compares queueing-based estimates with empirical baselines."*
+
+### Key Research Questions Addressed:
+1. **Error Propagation Decomposition:** Does availability prediction error stem primarily from arrival-rate misforecasts, exponential dwell-time approximations, or finite physical capacity limits? *(Finding: Arrival forecast error accounts for 51.8% of total MAE, while structural capacity bounds and zero-truncation contribute 48.2%).*
+2. **Exponential Dwell Assumption Test:** Does the memoryless exponential service assumption underlying Erlang-B hold for real-world municipal EV charging? *(Finding: Resoundingly rejected via Kolmogorov-Smirnov test, $p < 10^{-50}$; empirical dwell exhibits an under-dispersed $CV \approx 0.76\text{--}0.90$ with peak duration concentrated at 1–2 hours rather than memoryless decay).*
+3. **Calibration Under Distribution Shift:** Do forecast-driven queueing estimates maintain probability calibration when subject to distribution shifts? *(Finding: Queueing models recalibrated on 2018 validation data generalize robustly across both 2019 test [ECE = 1.08%] and 2020 COVID shock [ECE = 0.65%], dramatically outperforming static empirical baselines which suffered severe calibration breakdown [ECE = 14.03%]).*
 
 ---
 
@@ -40,9 +61,11 @@ An end-to-end Machine Learning and Decision Support system for municipal EV char
 │   │   ├── stations.py             # /api/stations, /api/stations/nearby, /api/stations/<id>
 │   │   ├── predictions.py          # /api/predictions/1-hour, /24-hour, /station/<id>
 │   │   ├── recommendations.py      # /api/recommendations
+│   │   ├── probabilistic.py        # /api/probabilistic/arrivals, /availability, /calibration, /summary
 │   │   └── charging_assistant.py   # /api/charging-points/*, /api/availability/*, /api/vehicles, /api/charging/estimate, /api/stations/recommend
 │   └── services/
 │       ├── model_service.py        # Singleton loader for Phase 5 XGBoost models
+│       ├── probabilistic_service.py # Singleton loader for probabilistic count & queueing models
 │       ├── data_service.py         # Read-only cached analytics and tail panels
 │       ├── prediction_service.py   # Leakage-free 1h & 24h forecasting engine
 │       └── recommendation_service.py # Explainable rule-based planning engine
@@ -182,6 +205,16 @@ python scripts/test_backend_api.py
 python scripts/test_availability.py
 ```
 
+**Availability Calibration & Error Propagation Suite:**
+```bash
+.\.venv\Scripts\activate
+# Run calibration and error propagation pipeline
+python -m ml.availability_calibration --horizon both --seed 42
+
+# Run calibration unit and regression tests
+python -m unittest scripts/test_availability_calibration.py
+```
+
 ---
 
 ## API Reference Summary
@@ -208,6 +241,8 @@ python scripts/test_availability.py
 | `/api/vehicles` | `GET` | Catalog of 15 verified electric vehicle models & technical specifications |
 | `/api/charging/estimate` | `POST` | Calculates charging duration with battery CC/CV taper curves above 80% SOC |
 | `/api/stations/recommend` | `POST` | Assesses target station and recommends nearby alternatives ranked by composite score |
+| `/api/availability-calibration/summary` | `GET` | Empirical calibration findings, ECE/Brier scores, error decomposition, and distribution shift |
+| `/api/availability-calibration/reliability-diagram` | `GET` | 10-bin calibration curves, bootstrap 95% CIs, and threshold-level decision metrics |
 
 ---
 

@@ -315,6 +315,27 @@ export function StationAnalysisPage({ initialStationId, onOpenForecastForStation
               </div>
             </div>
 
+            {/* Probabilistic Availability Insight Block */}
+            <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-slate-50 border border-emerald-200/80 rounded-xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-[11px] uppercase tracking-wider font-bold text-emerald-800">
+                  Calibrated Probabilistic Availability
+                </span>
+                <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                  Queueing Loss Prediction &amp; Discrete PMF
+                </h4>
+                <p className="text-xs text-slate-600 mt-1">
+                  Full-distribution Erlang-B availability and arrival-count quantiles are calibrated for this site.
+                </p>
+              </div>
+              <button
+                onClick={() => onOpenForecastForStation?.(detail.station_id)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm shrink-0"
+              >
+                <TrendingUp className="w-4 h-4" /> View Full Forecast
+              </button>
+            </div>
+
             {/* Recent Daily Activity Trend */}
             <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
               <h3 className="text-base font-bold text-slate-900">

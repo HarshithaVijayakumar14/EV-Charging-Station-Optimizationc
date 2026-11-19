@@ -7,6 +7,7 @@ import { PredictionsPage } from './pages/PredictionsPage';
 import { StationAnalysisPage } from './pages/StationAnalysisPage';
 import { RecommendationsPage } from './pages/RecommendationsPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
+import { ProbabilisticAvailabilityPage } from './pages/ProbabilisticAvailabilityPage';
 import { getHealth } from './services/api';
 
 export default function App() {
@@ -72,7 +73,10 @@ export default function App() {
               />
             )}
             {activePage === 'find-station' && (
-              <FindStationPage onNavigateToStation={handleNavigateToStation} />
+              <FindStationPage
+                initialStationId={targetStationId}
+                onNavigateToStation={handleNavigateToStation}
+              />
             )}
             {activePage === 'predictions' && (
               <PredictionsPage initialStationId={targetStationId} />
@@ -89,6 +93,12 @@ export default function App() {
               />
             )}
             {activePage === 'model-performance' && <ModelPerformancePage />}
+            {activePage === 'probabilistic-availability' && (
+              <ProbabilisticAvailabilityPage
+                initialStationId={targetStationId}
+                onNavigateToStation={handleNavigateToStation}
+              />
+            )}
           </div>
         </main>
       </div>

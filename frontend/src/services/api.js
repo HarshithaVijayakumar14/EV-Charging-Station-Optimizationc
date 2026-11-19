@@ -120,4 +120,32 @@ export const getNearbyStations = async (params = {}) => {
   return res.data;
 };
 
+// ==============================================================================
+// Probabilistic Arrival Forecasting & Distribution-Propagated Availability
+// ==============================================================================
+
+export const getProbArrivals = async (stationId = null, horizon = '1h') => {
+  const params = { horizon };
+  if (stationId) params.station_id = stationId;
+  const res = await api.get('/api/probabilistic/arrivals', { params });
+  return res.data;
+};
+
+export const getProbAvailability = async (stationId = null, horizon = '1h') => {
+  const params = { horizon };
+  if (stationId) params.station_id = stationId;
+  const res = await api.get('/api/probabilistic/availability', { params });
+  return res.data;
+};
+
+export const getProbCalibration = async () => {
+  const res = await api.get('/api/probabilistic/calibration');
+  return res.data;
+};
+
+export const getProbSummary = async () => {
+  const res = await api.get('/api/probabilistic/summary');
+  return res.data;
+};
+
 export default api;

@@ -85,6 +85,56 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
     <div className="space-y-6">
       <DisclaimerBanner />
 
+      {/* Quick Access Feature Navigation Ribbon */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-2.5">
+        <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
+          <Zap className="w-3.5 h-3.5 text-emerald-600" />
+          Quick Actions:
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => onNavigateToPage('find-station')}
+            className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition-all border border-emerald-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+            Find a Station &amp; Availability
+          </button>
+          <button
+            onClick={() => onNavigateToPage('predictions')}
+            className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold transition-all border border-blue-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+            Demand Forecasts (1h &amp; 24h)
+          </button>
+          <button
+            onClick={() => onNavigateToPage('probabilistic-availability')}
+            className="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold transition-all border border-purple-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <Clock className="w-3.5 h-3.5 text-purple-600" />
+            Probabilistic Availability (Erlang-B)
+          </button>
+          <button
+            onClick={() => onNavigateToPage('stations')}
+            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <Layers className="w-3.5 h-3.5 text-slate-600" />
+            Station Explorer (46 Sites)
+          </button>
+          <button
+            onClick={() => onNavigateToPage('recommendations')}
+            className="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold transition-all border border-amber-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            Optimization Plan
+          </button>
+          <button
+            onClick={() => onNavigateToPage('model-performance')}
+            className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition-all border border-indigo-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            Model Evaluation
+          </button>
+        </div>
+      </div>
+
       {/* Top KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
@@ -93,6 +143,8 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           subtitle={`Cleaned dataset: ${summary.date_range_pt.start.slice(0, 10)} to ${summary.date_range_pt.end.slice(0, 10)}`}
           icon={Zap}
           accent="emerald"
+          onClick={() => onNavigateToPage('stations')}
+          clickableText="Explore Station Sessions"
         />
         <StatCard
           title="Total Energy Delivered"
@@ -100,6 +152,8 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           subtitle={`${summary.total_energy_kwh.toLocaleString()} kWh cumulative across all ports`}
           icon={BatteryCharging}
           accent="blue"
+          onClick={() => onNavigateToPage('stations')}
+          clickableText="Inspect Energy Usage"
         />
         <StatCard
           title="Charging Stations"
@@ -107,6 +161,8 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           subtitle={`${summary.historical_training_stations_count} established + ${summary.cold_start_stations_count} cold-start (Dec 2020)`}
           icon={MapPin}
           accent="indigo"
+          onClick={() => onNavigateToPage('stations')}
+          clickableText="View All 46 Station Details"
         />
         <StatCard
           title="Peak vs. Lowest Demand Hour"
@@ -114,6 +170,8 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           subtitle={`${peakHour?.sessions.toLocaleString()} arrivals (${peakHour?.pct_share}%) vs. ${lowHour?.label} (${lowHour?.pct_share}%)`}
           icon={Clock}
           accent="amber"
+          onClick={() => onNavigateToPage('predictions')}
+          clickableText="Inspect Hourly Forecasts"
         />
       </div>
 
@@ -129,9 +187,17 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
                 Average network-wide session arrivals per active day across all 24 clock hours (Pacific Time)
               </p>
             </div>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 self-start">
-              Morning Commuter Surge (08:00–12:00)
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 self-start">
+                Morning Commuter Surge (08:00–12:00)
+              </span>
+              <button
+                onClick={() => onNavigateToPage('predictions')}
+                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
+              >
+                Forecasts &rarr;
+              </button>
+            </div>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -179,7 +245,15 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900">Demand by Day of Week</h2>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-bold text-slate-900">Demand by Day of Week</h2>
+            <button
+              onClick={() => onNavigateToPage('probabilistic-availability')}
+              className="text-xs font-semibold text-purple-700 hover:text-purple-800 flex items-center gap-1 cursor-pointer"
+            >
+              Arrival Curves &rarr;
+            </button>
+          </div>
           <p className="text-xs text-slate-500 mb-4">
             Average daily network sessions (Mon–Fri commuter dominance vs. Sat–Sun)
           </p>
@@ -223,6 +297,12 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
                 Growth through 2019 followed by the sharp April 2020 COVID-19 shelter-in-place shock (-87.1%)
               </p>
             </div>
+            <button
+              onClick={() => onNavigateToPage('model-performance')}
+              className="text-xs font-semibold text-indigo-700 hover:text-indigo-800 flex items-center gap-1 cursor-pointer shrink-0"
+            >
+              Model Shifts &amp; Evals &rarr;
+            </button>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -257,9 +337,17 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
         {/* Level 1 vs Level 2 Breakdown */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Layers className="w-4 h-4 text-emerald-600" />
-              <h2 className="text-base font-bold text-slate-900">Level 1 vs. Level 2 Usage</h2>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-emerald-600" />
+                <h2 className="text-base font-bold text-slate-900">Level 1 vs. Level 2 Usage</h2>
+              </div>
+              <button
+                onClick={() => onNavigateToPage('find-station')}
+                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
+              >
+                Find Ports &rarr;
+              </button>
             </div>
             <p className="text-xs text-slate-500 mb-4">
               Cleaned unambiguous port types across all 259,411 sessions
@@ -318,11 +406,13 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-base font-bold text-slate-900">Top 10 Highest-Volume Stations</h2>
-              <p className="text-xs text-slate-500">Click any station to inspect detailed history &amp; forecasts</p>
+              <p className="text-xs text-slate-500">
+                Click any station or direct action button to view Availability, Forecasts, or Probabilistic Curves
+              </p>
             </div>
             <button
               onClick={() => onNavigateToPage('stations')}
-              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
             >
               View all 46 <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -331,36 +421,70 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                  <th className="py-2.5 pr-3">Station</th>
-                  <th className="py-2.5 px-3 text-right">Total Sessions</th>
-                  <th className="py-2.5 px-3 text-right">Total Energy</th>
-                  <th className="py-2.5 px-3 text-right">Sessions / Active Day</th>
-                  <th className="py-2.5 pl-3 text-right">Avg kWh</th>
+                  <th className="py-2.5 pr-2">Station</th>
+                  <th className="py-2.5 px-2 text-right">Sessions</th>
+                  <th className="py-2.5 px-2 text-right">Total Energy</th>
+                  <th className="py-2.5 px-2 text-right">Per Day</th>
+                  <th className="py-2.5 px-2 text-right">Avg kWh</th>
+                  <th className="py-2.5 pl-2 text-right">Direct Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {summary.top_10_stations.map((st, idx) => (
                   <tr
                     key={st.station_id}
-                    onClick={() => onNavigateToStation(st.station_id)}
-                    className="hover:bg-emerald-50/50 cursor-pointer transition-colors"
+                    onClick={() => onNavigateToStation(st.station_id, 'stations')}
+                    className="hover:bg-slate-50 cursor-pointer transition-colors"
                   >
-                    <td className="py-2.5 pr-3 font-medium text-slate-900 flex items-center gap-2">
+                    <td className="py-2.5 pr-2 font-medium text-slate-900 flex items-center gap-2">
                       <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
-                      <span className="truncate max-w-[210px]">{st.short_name}</span>
+                      <span className="truncate max-w-[170px]" title={st.short_name}>
+                        {st.short_name}
+                      </span>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-semibold text-slate-800">
+                    <td className="py-2.5 px-2 text-right font-semibold text-slate-800">
                       {st.total_sessions.toLocaleString()}
                     </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
+                    <td className="py-2.5 px-2 text-right text-slate-600 text-xs">
                       {st.total_energy_kwh.toLocaleString()} kWh
                     </td>
-                    <td className="py-2.5 px-3 text-right text-slate-600">
+                    <td className="py-2.5 px-2 text-right text-slate-600 text-xs">
                       {st.sessions_per_active_day}
                     </td>
-                    <td className="py-2.5 pl-3 text-right text-slate-600">{st.mean_energy_kwh}</td>
+                    <td className="py-2.5 px-2 text-right text-slate-600 text-xs">{st.mean_energy_kwh}</td>
+                    <td className="py-2.5 pl-2 text-right">
+                      <div
+                        className="flex items-center justify-end gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation(st.station_id, 'find-station')}
+                          className="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-semibold border border-emerald-200 transition-colors cursor-pointer"
+                          title={`Check Availability Assistant for ${st.short_name}`}
+                        >
+                          Availability
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation(st.station_id, 'predictions')}
+                          className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-800 text-[11px] font-semibold border border-blue-200 transition-colors cursor-pointer"
+                          title={`View Demand Forecast for ${st.short_name}`}
+                        >
+                          Forecast
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToStation(st.station_id, 'probabilistic-availability')}
+                          className="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-800 text-[11px] font-semibold border border-purple-200 transition-colors cursor-pointer"
+                          title={`View Probabilistic Erlang-B Curve for ${st.short_name}`}
+                        >
+                          Probabilistic
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -388,34 +512,66 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
               {(pred1h?.predictions || []).slice(0, 6).map((item) => (
                 <div
                   key={item.station_id}
-                  onClick={() => onNavigateToStation(item.station_id, 'predictions')}
-                  className="p-3 rounded-lg border border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/30 cursor-pointer transition-all flex items-center justify-between gap-2"
+                  className="p-3 rounded-lg border border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all space-y-2"
                 >
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-900 truncate">{item.short_name}</p>
-                    <p className="text-[11px] text-slate-500">
-                      Target: {item.target_timestamp_pt.slice(0, 16)} PT
-                    </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 truncate">{item.short_name}</p>
+                      <p className="text-[11px] text-slate-500">
+                        Target: {item.target_timestamp_pt.slice(0, 16)} PT
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="block text-sm font-bold text-emerald-700">
+                        {item.predicted_sessions.toFixed(2)}
+                      </span>
+                      <span className="block text-[10px] text-slate-400">
+                        (~{item.predicted_sessions_rounded} arr/hr)
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="block text-sm font-bold text-emerald-700">
-                      {item.predicted_sessions.toFixed(2)}
-                    </span>
-                    <span className="block text-[10px] text-slate-400">
-                      (~{item.predicted_sessions_rounded} arr/hr)
-                    </span>
+                  <div className="flex items-center justify-end gap-1.5 pt-1.5 border-t border-slate-100 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToStation(item.station_id, 'find-station')}
+                      className="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold cursor-pointer transition-colors"
+                    >
+                      Availability
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToStation(item.station_id, 'predictions')}
+                      className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold cursor-pointer transition-colors"
+                    >
+                      Forecast
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToStation(item.station_id, 'probabilistic-availability')}
+                      className="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold cursor-pointer transition-colors"
+                    >
+                      Probabilistic
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <button
-            onClick={() => onNavigateToPage('predictions')}
-            className="mt-4 w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5"
-          >
-            Open Interactive Demand Forecaster <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="space-y-2 mt-4">
+            <button
+              onClick={() => onNavigateToPage('predictions')}
+              className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              Open Interactive Demand Forecaster <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => onNavigateToPage('find-station')}
+              className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              Find a Station &amp; Availability Assistant <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

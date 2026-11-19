@@ -26,6 +26,10 @@ const PAGE_TITLES = {
     title: 'Model Training & Evaluation Metrics',
     subtitle: 'Phase 5 chronological validation (2018), main test (2019), and COVID OOD stress test (2020)',
   },
+  'probabilistic-availability': {
+    title: 'Probabilistic Availability & Queueing Propagation',
+    subtitle: 'Calibrated discrete arrival PMFs propagated through Erlang-B queueing with 5–95% uncertainty bounds',
+  },
 };
 
 export function Navbar({ activePage, health, onMenuClick }) {

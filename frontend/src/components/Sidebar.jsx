@@ -8,6 +8,8 @@ import {
   Zap,
   X,
   Compass,
+  CheckCircle2,
+  Layers,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -17,6 +19,7 @@ const NAV_ITEMS = [
   { id: 'stations', label: 'Station Explorer', icon: MapPin },
   { id: 'recommendations', label: 'Optimization Plan', icon: Lightbulb },
   { id: 'model-performance', label: 'Model Evaluation', icon: BarChart3 },
+  { id: 'probabilistic-availability', label: 'Probabilistic Availability', icon: Layers },
 ];
 
 export function Sidebar({ activePage, onSelectPage, isOpen, onClose }) {

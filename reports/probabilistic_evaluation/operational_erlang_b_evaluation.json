@@ -1,0 +1,11 @@
+{
+  "n_evaluated_hours": 6804,
+  "full_station_hours": 221,
+  "full_station_prevalence": 0.0325,
+  "point_erlang_brier_score": 0.05204,
+  "distribution_erlang_brier_score": 0.03634,
+  "brier_improvement_percent": 30.17,
+  "mean_90_interval_width": 0.5314,
+  "evaluation_dataset": "historical_availability_recent.csv",
+  "honest_findings": "Distribution-propagated Erlang-B accounts for non-linear Jensen's inequality effects where E[B(c, lambda)] > B(c, E[lambda]) in volatile hours, improving probabilistic calibration and providing calibrated uncertainty bounds for driver journey planning."
+}
