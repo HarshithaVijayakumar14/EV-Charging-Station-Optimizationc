@@ -1,15 +1,54 @@
 import axios from 'axios';
 
 // Configurable API base URL:
-// In production (GitHub Pages), set VITE_API_BASE_URL in GitHub repo variables to point to Render
-// In local development, falls back to empty string to leverage the Vite proxy or unified Flask server
-const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
-export const API_BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
+// 1. Checks localStorage for any user-configured endpoint override
+// 2. Checks build-time environment variable (VITE_API_BASE_URL)
+// 3. If hosted on GitHub Pages, defaults to production Render URL (prevents 404 from GitHub Pages static host)
+// 4. In local development, defaults to empty string to leverage the Vite proxy (:5173) or unified Flask server (:5000)
+const getInitialBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    const userCustom = window.localStorage.getItem('EV_API_BASE_URL');
+    if (userCustom && userCustom.trim()) {
+      return userCustom.trim().replace(/\/$/, '');
+    }
+
+    const envUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+    if (envUrl) {
+      return envUrl.replace(/\/$/, '');
+    }
+
+    if (window.location.hostname.includes('github.io')) {
+      return 'https://ev-charging-station-api.onrender.com';
+    }
+  }
+
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+  return envUrl.replace(/\/$/, '');
+};
+
+export let API_BASE_URL = getInitialBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 25000,
+  timeout: 35000,
 });
+
+/**
+ * Updates the active API base URL at runtime and persists to localStorage.
+ */
+export const setApiBaseUrl = (newUrl) => {
+  const cleaned = (newUrl || '').trim().replace(/\/$/, '');
+  if (typeof window !== 'undefined') {
+    if (cleaned) {
+      window.localStorage.setItem('EV_API_BASE_URL', cleaned);
+    } else {
+      window.localStorage.removeItem('EV_API_BASE_URL');
+    }
+  }
+  API_BASE_URL = cleaned;
+  api.defaults.baseURL = cleaned;
+  return cleaned;
+};
 
 export const getHealth = async () => {
   const res = await api.get('/api/health');

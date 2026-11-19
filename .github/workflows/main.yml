@@ -36,8 +36,14 @@ jobs:
       - name: Build React application
         env:
           VITE_BASE_PATH: '/EV-Charging-Station-Optimizationc/'
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://ev-charging-station-api.onrender.com' }}
         run: npm run build
+        working-directory: frontend
+
+      - name: Ensure GitHub Pages SPA fallback & disable Jekyll
+        run: |
+          touch dist/.nojekyll
+          if [ ! -f dist/404.html ]; then cp dist/index.html dist/404.html; fi
         working-directory: frontend
 
       - name: Setup Pages
