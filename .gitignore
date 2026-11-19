@@ -1,0 +1,39 @@
+﻿# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Local databases and logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Large datasets
+dataset/raw/
+dataset/processed/*.csv
+data/*.csv
+EVChargingStationUsage.csv
+
+# Generated files
+backend/cache/
+backups/
+temp/
+tmp/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
