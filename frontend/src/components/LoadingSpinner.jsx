@@ -105,6 +105,18 @@ export function ErrorState({ message, onRetry }) {
           </button>
         )}
         {isGitHubPages && (
+          <button
+            onClick={() => {
+              setApiBaseUrl('');
+              window.location.reload();
+            }}
+            className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-xl shadow-sm transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Use Verified Dataset
+          </button>
+        )}
+        {isGitHubPages && (
           <a
             href="https://render.com/deploy?repo=https://github.com/HarshithaVijayakumar14/EV-Charging-Station-Optimizationc"
             target="_blank"

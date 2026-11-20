@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { id: 'recommendations', label: 'Optimization Plan', icon: Lightbulb },
   { id: 'model-performance', label: 'Model Evaluation', icon: BarChart3 },
   { id: 'probabilistic-availability', label: 'Probabilistic Availability', icon: Layers },
+  { id: 'availability-calibration', label: 'Availability Calibration', icon: CheckCircle2 },
 ];
 
 export function Sidebar({ activePage, onSelectPage, isOpen, onClose }) {

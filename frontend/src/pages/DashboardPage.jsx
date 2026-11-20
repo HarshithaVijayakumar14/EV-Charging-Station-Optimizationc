@@ -132,6 +132,12 @@ export function DashboardPage({ onNavigateToStation, onNavigateToPage }) {
           >
             Model Evaluation
           </button>
+          <button
+            onClick={() => onNavigateToPage('availability-calibration')}
+            className="px-3 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition-all border border-teal-200 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            Availability Calibration
+          </button>
         </div>
       </div>
 

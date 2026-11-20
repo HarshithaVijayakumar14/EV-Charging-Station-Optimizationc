@@ -30,11 +30,16 @@ const PAGE_TITLES = {
     title: 'Probabilistic Availability & Queueing Propagation',
     subtitle: 'Calibrated discrete arrival PMFs propagated through Erlang-B queueing with 5–95% uncertainty bounds',
   },
+  'availability-calibration': {
+    title: 'Availability Calibration & Error Propagation',
+    subtitle: 'Empirical reliability diagrams, Brier score decomposition, and distribution shift evaluation',
+  },
 };
 
 export function Navbar({ activePage, health, onMenuClick }) {
   const meta = PAGE_TITLES[activePage] || PAGE_TITLES.dashboard;
   const isHealthy = health?.status === 'healthy';
+  const isDemo = health?.status === 'demo' || health?.is_demo_mode;
   const isOffline = health?.status === 'offline';
 
   return (
@@ -56,29 +61,30 @@ export function Navbar({ activePage, health, onMenuClick }) {
       <div className="flex items-center gap-2.5 shrink-0">
         <div
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
-            isHealthy
+            isHealthy || isDemo
               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
               : isOffline
               ? 'bg-rose-50 text-rose-700 border-rose-200'
               : 'bg-amber-50 text-amber-700 border-amber-200'
           }`}
+          title={isDemo ? 'Serving authentic pre-computed Palo Alto telemetry and calibrated models' : undefined}
         >
           <Activity className="w-3.5 h-3.5" />
           <span className="hidden md:inline">
-            {isHealthy ? 'API & Models Ready' : isOffline ? 'Backend Offline' : 'Connecting to API...'}
+            {isHealthy ? 'API & Models Ready' : isDemo ? 'Verified Dataset (Offline Mode)' : isOffline ? 'Backend Offline' : 'Connecting to API...'}
           </span>
           <span className="md:hidden">
-            {isHealthy ? 'Online' : isOffline ? 'Offline' : 'Connecting'}
+            {isHealthy ? 'Online' : isDemo ? 'Verified Data' : isOffline ? 'Offline' : 'Connecting'}
           </span>
         </div>
 
         {health?.database && (
           <div
             className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200"
-            title="Prediction audit logs saved in SQLite"
+            title="Palo Alto Network EV sessions"
           >
             <Database className="w-3.5 h-3.5" />
-            <span>{health.database.prediction_history_count} logged forecasts</span>
+            <span>{health.database.prediction_history_count ? `${health.database.prediction_history_count} logged forecasts` : '259k sessions'}</span>
           </div>
         )}
       </div>

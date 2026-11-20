@@ -8,6 +8,7 @@ import { StationAnalysisPage } from './pages/StationAnalysisPage';
 import { RecommendationsPage } from './pages/RecommendationsPage';
 import { ModelPerformancePage } from './pages/ModelPerformancePage';
 import { ProbabilisticAvailabilityPage } from './pages/ProbabilisticAvailabilityPage';
+import { AvailabilityCalibrationPage } from './pages/AvailabilityCalibrationPage';
 import { getHealth } from './services/api';
 
 export default function App() {
@@ -98,6 +99,9 @@ export default function App() {
                 initialStationId={targetStationId}
                 onNavigateToStation={handleNavigateToStation}
               />
+            )}
+            {activePage === 'availability-calibration' && (
+              <AvailabilityCalibrationPage />
             )}
           </div>
         </main>
